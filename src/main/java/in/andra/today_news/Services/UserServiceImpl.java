@@ -2,6 +2,7 @@ package in.andra.today_news.Services;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,33 @@ public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
 
+
+    public void register(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new IllegalArgumentException("A user with this email already exists.");
+        }
+        user.setRole("USER");
+        user.setCreatedAt(java.time.LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    @Override
+    public boolean authenticate(String username, String password) {
+        Optional<User> user = userRepository.findByUsernameAndPassword(username,password);
+        return user.isPresent() && user.get().getPassword().equals(password);
+    }
+
+
+    @Override
+    public boolean resetPassword(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            // Simulate sending reset email or changing the password
+            System.out.println("Reset link sent to: " + email);
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public User createUser(User user) {
