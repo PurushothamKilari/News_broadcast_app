@@ -1,6 +1,7 @@
 package in.andra.today_news.Controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import in.andra.today_news.EntityClasses.User;
@@ -22,6 +24,33 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+      // 1. Register a new user
+    @PostMapping("/register")
+    public String registerUser(@RequestBody User user) {
+        userService.register(user);
+        return "User registered successfully";
+    }
+
+    @PostMapping("/login")
+    public String loginUser(@RequestParam String username, @RequestParam String password) {
+        boolean isAuthenticated = userService.authenticate(username, password);
+        if (isAuthenticated) {
+            return "Login successful";
+        } else {
+            return "Invalid username or password";
+        }
+    }
+
+    @PostMapping("/forgetpassword")
+    public String forgetPassword(@RequestParam String email) {
+        boolean isReset = userService.resetPassword(email);
+        if (isReset) {
+            return "Password reset email sent";
+        } else {
+            return "Email not registered";
+        }
+    }
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
